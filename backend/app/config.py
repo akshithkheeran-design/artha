@@ -1,4 +1,5 @@
 import base64
+import hashlib
 import os
 import secrets
 from pathlib import Path
@@ -20,10 +21,15 @@ SEED_DEMO = os.getenv("ARTHA_SEED_DEMO", "false" if ENV == "production" else "tr
 def _load_secret(name: str, env: str, nbytes: int) -> bytes:
     value = os.getenv(env)
     if value:
-        raw = base64.b64decode(value)
-        if len(raw) < nbytes:
-            raise RuntimeError(f"{env} must decode to at least {nbytes} bytes")
-        return raw[:nbytes]
+        if len(value) < 32:
+            raise RuntimeError(f"{env} must be at least 32 characters of random data")
+        try:
+            raw = base64.b64decode(value, validate=True)
+        except ValueError:
+            raw = b""
+        if len(raw) >= nbytes:
+            return raw[:nbytes]
+        return hashlib.shake_256(f"artha:{name}:".encode() + value.encode()).digest(nbytes)
     if ENV == "production":
         raise RuntimeError(f"{env} must be set in production (base64, from a secrets manager)")
     path = DATA_DIR / f"{name}.key"

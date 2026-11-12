@@ -24,5 +24,14 @@ Dev mode: `npm run dev` in `frontend` (proxies `/api` to port 8000). Tests: `cd 
 
 Demo accounts (synthetic, development only): `lakshmi@artha.demo`, `ravi@artha.demo`, `meena@artha.demo`, `bc@artha.demo`, `manager@artha.demo`, `dic@artha.demo`, `auditor@artha.demo` — password `Artha@Demo2026`.
 
+## Deploy (free, one click)
+ARTHA has a Python backend, so a static host alone (Netlify/GitHub Pages) cannot run it.
+
+**Render (recommended — whole app in one service):** render.com → New → Blueprint → pick this repo → Apply. `render.yaml` builds the `Dockerfile`, generates the four secret keys and seeds the demo accounts. The free plan's disk is temporary, so demo data resets on restart.
+
+**Netlify (frontend only):** deploy the backend on Render first, then replace `BACKEND_URL` in `netlify.toml` with its URL and import the repo in Netlify — `netlify.toml` already sets base `frontend`, build command and publish `dist`.
+
+**Any Docker host:** `docker build -t artha . && docker run -p 8000:8000 -e ARTHA_MASTER_KEY=… -e ARTHA_JWT_SECRET=… -e ARTHA_SIGNING_SEED=… -e ARTHA_INDEX_KEY=… -e ARTHA_SEED_DEMO=true artha`
+
 ## Production
-Set `ARTHA_ENV=production` and provide `ARTHA_MASTER_KEY`, `ARTHA_JWT_SECRET`, `ARTHA_SIGNING_SEED`, `ARTHA_INDEX_KEY` (base64) from a secrets manager — the app refuses to start without them. Demo seeding is off by default in production; serve behind TLS (secure cookies + HSTS on), and use Postgres via `ARTHA_DATABASE_URL`.
+Set `ARTHA_ENV=production` and provide `ARTHA_MASTER_KEY`, `ARTHA_JWT_SECRET`, `ARTHA_SIGNING_SEED`, `ARTHA_INDEX_KEY` (32+ random characters or base64) from a secrets manager — the app refuses to start without them. Demo seeding is off by default in production; serve behind TLS (secure cookies + HSTS on), and use Postgres via `ARTHA_DATABASE_URL`.

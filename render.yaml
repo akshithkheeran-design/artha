@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: artha
+    runtime: docker
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      - key: ARTHA_ENV
+        value: production
+      - key: ARTHA_SEED_DEMO
+        value: "true"
+      - key: ARTHA_MASTER_KEY
+        generateValue: true
+      - key: ARTHA_JWT_SECRET
+        generateValue: true
+      - key: ARTHA_SIGNING_SEED
+        generateValue: true
+      - key: ARTHA_INDEX_KEY
+        generateValue: true
