@@ -6,6 +6,7 @@ import {
 import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../lib/auth'
+import { useStaticDemo } from '../lib/hooks'
 import { useBusiness } from '../lib/business'
 import type { Role } from '../lib/types'
 import { Chip } from './ui'
@@ -50,11 +51,14 @@ function Clock() {
 }
 
 export default function Layout() {
+  const demo = useStaticDemo()
   const { user, logout } = useAuth()
   const { businesses, current, select } = useBusiness()
   const [open, setOpen] = useState(false)
   const loc = useLocation()
-  useEffect(() => setOpen(false), [loc.pathname])
+  useEffect(() => {
+    setOpen(false)
+  }, [loc.pathname])
   if (!user) return null
 
   return (
@@ -104,7 +108,7 @@ export default function Layout() {
           <button className="text-slate-300 lg:hidden" onClick={() => setOpen(true)} aria-label="Open menu"><Menu className="h-5 w-5" /></button>
           <div className="flex items-center gap-2">
             <span className="h-2 w-2 animate-pulseDot rounded-full bg-neon-green" />
-            <span className="label hidden sm:inline">Systems nominal</span>
+            <span className="label hidden sm:inline">{demo ? 'Static demo · synthetic data' : 'Systems nominal'}</span>
           </div>
           <Clock />
           {businesses.length > 0 && (

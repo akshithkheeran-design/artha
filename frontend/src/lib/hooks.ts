@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { api } from './api'
+import { api, isStaticDemo } from './api'
 
 export function useApi<T>(path: string | null, deps: unknown[] = []) {
   const [data, setData] = useState<T | null>(null)
@@ -48,4 +48,12 @@ export function useAction() {
     }
   }, [])
   return { busy, error, run, setError }
+}
+
+export function useStaticDemo() {
+  const [demo, setDemo] = useState(false)
+  useEffect(() => {
+    isStaticDemo().then(setDemo)
+  }, [])
+  return demo
 }

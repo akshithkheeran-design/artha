@@ -1,4 +1,5 @@
 import { ChevronRight, ShieldCheck } from 'lucide-react'
+import { isStaticDemo } from '../lib/api'
 import { useEffect, useState } from 'react'
 
 const CHECKS = [
@@ -14,9 +15,10 @@ const CHECKS = [
 export default function Boot({ onDone }: { onDone: () => void }) {
   const [n, setN] = useState(0)
   const [health, setHealth] = useState<boolean | null>(null)
+  const [demo, setDemo] = useState(false)
 
   useEffect(() => {
-    fetch('/api/health', { cache: 'no-store' }).then((r) => setHealth(r.ok)).catch(() => setHealth(false))
+    isStaticDemo().then((d) => { setDemo(d); setHealth(true) })
     const t = setInterval(() => setN((x) => (x >= CHECKS.length ? x : x + 1)), 260)
     return () => clearInterval(t)
   }, [])
@@ -47,7 +49,7 @@ export default function Boot({ onDone }: { onDone: () => void }) {
           <div className={`flex items-center justify-between pt-1 transition-opacity ${done ? 'opacity-100' : 'opacity-0'}`}>
             <span className="text-slate-300"><span className="text-cyan-400">▸</span> API heartbeat</span>
             <span className={health ? 'text-neon-green' : health === false ? 'text-neon-red' : 'text-neon-amber'}>
-              [{health ? 'OK' : health === false ? 'OFFLINE' : '…'}]
+              [{demo ? 'STATIC DEMO' : health ? 'OK' : health === false ? 'OFFLINE' : '…'}]
             </span>
           </div>
         </div>

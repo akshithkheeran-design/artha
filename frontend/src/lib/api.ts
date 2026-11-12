@@ -39,12 +39,26 @@ async function request(path: string, { method = 'GET', body, form, signal }: Opt
   return res
 }
 
+let demoCheck: Promise<boolean> | null = null
+export function isStaticDemo(): Promise<boolean> {
+  if (import.meta.env.VITE_STATIC_DEMO === '1') return Promise.resolve(true)
+  return (demoCheck ??= fetch('/api/health', { cache: 'no-store' })
+    .then((r) => !(r.ok && (r.headers.get('content-type') ?? '').includes('application/json')))
+    .catch(() => true))
+}
+
 export async function api<T>(path: string, opts?: Opts): Promise<T> {
+  if (await isStaticDemo()) {
+    const { demoApi } = await import('./demo')
+    if (opts?.form) throw new ApiError(400, 'Uploads need the live ARTHA backend — this site is running as a read-only static demo.')
+    return (await demoApi(path, opts?.method ?? 'GET', opts?.body)) as T
+  }
   const res = await request(path, opts)
   return (await res.json()) as T
 }
 
 export async function downloadBlob(path: string, filename: string) {
+  if (await isStaticDemo()) throw new ApiError(400, 'Encrypted document download needs the live ARTHA backend.')
   const res = await request(path)
   const url = URL.createObjectURL(await res.blob())
   const a = document.createElement('a')

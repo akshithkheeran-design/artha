@@ -2,6 +2,7 @@ import { ArrowRight, BadgeIndianRupee, FileWarning, Lock, ShieldCheck, Users, Us
 import { useState, type FormEvent } from 'react'
 import { ErrorBox, Field } from '../components/ui'
 import { useAuth } from '../lib/auth'
+import { useStaticDemo } from '../lib/hooks'
 import { useAction } from '../lib/hooks'
 
 const DEMO_PW = 'Artha@Demo2026'
@@ -22,6 +23,7 @@ const PAIN = [
 ]
 
 export default function Login() {
+  const demo = useStaticDemo()
   const { login, register } = useAuth()
   const [mode, setMode] = useState<'login' | 'register'>('login')
   const [email, setEmail] = useState('')
@@ -104,6 +106,7 @@ export default function Login() {
               {busy ? 'Verifying…' : mode === 'login' ? 'Sign in securely' : 'Create entrepreneur account'} <ArrowRight className="h-4 w-4" />
             </button>
             <p className="text-center text-[11px] text-slate-500">Sessions expire after 30 minutes. 5 wrong passwords lock the account for 15 minutes.</p>
+            {demo && <p className="rounded-lg border border-neon-amber/30 bg-neon-amber/5 p-2 text-center text-[11px] text-neon-amber">Static demo: no backend is connected, so this runs on synthetic sample data in your browser. Pick a persona below to sign in.</p>}
           </form>
 
           <div className="panel animate-rise p-4">

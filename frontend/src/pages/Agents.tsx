@@ -84,7 +84,9 @@ function Chat({ b }: { b: Business }) {
   const [text, setText] = useState('')
   const { busy, error, run } = useAction()
   const end = useRef<HTMLDivElement>(null)
-  useEffect(() => end.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), [msgs])
+  useEffect(() => {
+    end.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+  }, [msgs])
 
   const send = (q: string) => {
     if (!q.trim()) return
